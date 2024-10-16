@@ -670,6 +670,10 @@ static inline bool matches_pseudo_class(CSS::Selector::SimpleSelector::PseudoCla
         // FIXME: fullscreen elements are also modal.
         return false;
     }
+    case CSS::PseudoClass::PopoverOpen: {
+        //FIXME: implement
+        return false;
+    }
     }
 
     return false;

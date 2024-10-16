@@ -111,11 +111,16 @@ void BlockFormattingContext::parent_context_did_dimension_child_root_box()
     if (m_layout_mode == LayoutMode::Normal) {
         // We can also layout absolutely positioned boxes within this BFC.
         for (auto& child : root().contained_abspos_children()) {
-            auto& box = verify_cast<Box>(*child);
-            auto& cb_state = m_state.get(*box.containing_block());
-            auto available_width = AvailableSize::make_definite(cb_state.content_width() + cb_state.padding_left + cb_state.padding_right);
-            auto available_height = AvailableSize::make_definite(cb_state.content_height() + cb_state.padding_top + cb_state.padding_bottom);
-            layout_absolutely_positioned_element(box, AvailableSpace(available_width, available_height));
+            if(is<Box>(*child)) {
+                auto& box = static_cast<const Box&>(*child);
+                auto& cb_state = m_state.get(*box.containing_block());
+                auto available_width = AvailableSize::make_definite(cb_state.content_width() + cb_state.padding_left + cb_state.padding_right);
+                auto available_height = AvailableSize::make_definite(cb_state.content_height() + cb_state.padding_top + cb_state.padding_bottom);
+                layout_absolutely_positioned_element(box, AvailableSpace(available_width, available_height));
+            }
+            else {
+                dbgln("FIXME: Unexpected non-Box in block formatting context: {}", child->debug_description());    
+            }
         }
     }
 }
