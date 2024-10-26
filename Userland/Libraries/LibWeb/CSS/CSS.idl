@@ -1,3 +1,12 @@
+
+// https://www.w3.org/TR/css-properties-values-api-1/#registering-custom-properties
+dictionary PropertyDefinition {
+    required DOMString name;
+             DOMString syntax       = "*";
+    required boolean   inherits;
+             DOMString initialValue;
+};
+
 // https://www.w3.org/TR/cssom-1/#namespacedef-css
 [Exposed=Window]
 namespace CSS {
@@ -5,4 +14,7 @@ namespace CSS {
 
     boolean supports(CSSOMString property, CSSOMString value);
     boolean supports(CSSOMString conditionText);
+
+    // https://www.w3.org/TR/css-properties-values-api-1/#registering-custom-properties
+    undefined registerProperty(PropertyDefinition definition);
 };

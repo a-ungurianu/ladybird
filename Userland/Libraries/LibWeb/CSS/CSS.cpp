@@ -61,4 +61,11 @@ WebIDL::ExceptionOr<bool> supports(JS::VM& vm, StringView condition_text)
     return false;
 }
 
+WebIDL::ExceptionOr<void> register_property(JS::VM& vm, PropertyDefinition const& property_def)
+{
+    (void)vm;
+    (void)property_def;
+    return {};
+}
+
 }
