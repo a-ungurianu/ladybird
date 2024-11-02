@@ -48,6 +48,8 @@ enum class QuirksMode {
     Yes
 };
 
+typedef HashMap<FlyString, Empty> RegisteredPropertySet;
+
 // https://html.spec.whatwg.org/multipage/dom.html#document-load-timing-info
 struct DocumentLoadTimingInfo {
     // https://html.spec.whatwg.org/multipage/dom.html#navigation-start-time
@@ -745,6 +747,9 @@ public:
 
     JS::NonnullGCPtr<EditingHostManager> editing_host_manager() const { return *m_editing_host_manager; }
 
+    // https://www.w3.org/TR/css-properties-values-api-1/#dom-window-registeredpropertyset-slot
+    RegisteredPropertySet& registered_property_set();
+
 protected:
     virtual void initialize(JS::Realm&) override;
     virtual void visit_edges(Cell::Visitor&) override;
@@ -1028,6 +1033,8 @@ private:
     mutable OwnPtr<Unicode::Segmenter> m_word_segmenter;
 
     JS::NonnullGCPtr<EditingHostManager> m_editing_host_manager;
+
+    RegisteredPropertySet m_registered_property_set;
 };
 
 template<>

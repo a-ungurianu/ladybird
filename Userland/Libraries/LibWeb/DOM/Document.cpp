@@ -5750,4 +5750,9 @@ void Document::set_onvisibilitychange(WebIDL::CallbackType* value)
     set_event_handler_attribute(HTML::EventNames::visibilitychange, value);
 }
 
+RegisteredPropertySet& Document::registered_property_set()
+{
+    return m_registered_property_set;
+}
+
 }

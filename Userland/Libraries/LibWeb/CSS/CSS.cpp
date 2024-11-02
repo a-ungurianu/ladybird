@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include <AK/String.h>
 #include <LibJS/Runtime/VM.h>
 #include <LibWeb/CSS/CSS.h>
 #include <LibWeb/CSS/Parser/Parser.h>
 #include <LibWeb/CSS/PropertyID.h>
 #include <LibWeb/CSS/PropertyName.h>
 #include <LibWeb/CSS/Serialize.h>
+#include <LibWeb/HTML/Window.h>
 
 namespace Web::CSS {
 
@@ -61,10 +63,32 @@ WebIDL::ExceptionOr<bool> supports(JS::VM& vm, StringView condition_text)
     return false;
 }
 
+// https://www.w3.org/TR/css-properties-values-api-1/#the-registerproperty-function
 WebIDL::ExceptionOr<void> register_property(JS::VM& vm, PropertyDefinition const& property_def)
 {
-    (void)vm;
-    (void)property_def;
+    // To register a custom property with name being a string, and optionally syntax being a string,
+    // inherits being a boolean, and initialValue being a string, execute these steps:
+
+    auto& realm = *vm.current_realm();
+
+    // 1. Let *property set* be the value of the current global object’s associated Document’s [[registeredPropertySet]] slot.
+    auto& window = verify_cast<HTML::Window>(HTML::current_global_object());
+    auto& property_set = window.associated_document().registered_property_set();
+
+    // 2. If name is not a custom property name string, throw a SyntaxError and exit this algorithm.
+    if (!is_a_custom_property_name_string(property_def.name)) {
+        return WebIDL::SyntaxError::create(realm, "Bad property name"_string);
+    }
+
+    //    If property set already contains an entry with name as its property name (compared codepoint-wise),
+    //    throw an InvalidModificationError and exit this algorithm.
+
+    // TODO: Does this count as codepoint-wise comparison?
+    if (property_set.contains(property_def.name)) {
+        return WebIDL::InvalidModificationError::create(realm, "Property already registed"_string);
+    }
+
+    property_set.set(property_def.name, {});
     return {};
 }
 
