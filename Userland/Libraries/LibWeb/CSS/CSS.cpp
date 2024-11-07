@@ -9,6 +9,7 @@
 #include <LibJS/Runtime/VM.h>
 #include <LibWeb/CSS/CSS.h>
 #include <LibWeb/CSS/Parser/Parser.h>
+#include <LibWeb/CSS/Parser/PropertySyntaxParser.h>
 #include <LibWeb/CSS/PropertyID.h>
 #include <LibWeb/CSS/PropertyName.h>
 #include <LibWeb/CSS/Serialize.h>
@@ -72,7 +73,7 @@ WebIDL::ExceptionOr<void> register_property(JS::VM& vm, PropertyDefinition const
     auto& realm = *vm.current_realm();
 
     // 1. Let *property set* be the value of the current global object’s associated Document’s [[registeredPropertySet]] slot.
-    auto& window = verify_cast<HTML::Window>(HTML::current_global_object());
+    auto& window = verify_cast<HTML::Window>(HTML::current_principal_global_object());
     auto& property_set = window.associated_document().registered_property_set();
 
     // 2. If name is not a custom property name string, throw a SyntaxError and exit this algorithm.
@@ -87,6 +88,36 @@ WebIDL::ExceptionOr<void> register_property(JS::VM& vm, PropertyDefinition const
     if (property_set.contains(property_def.name)) {
         return WebIDL::InvalidModificationError::create(realm, "Property already registed"_string);
     }
+
+    // 3. Attempt to consume a syntax definition from syntax. If it returns failure, throw a SyntaxError.
+    //    Otherwise, let syntax definition be the returned syntax definition.
+    Parser::PropertySyntaxParser syntax_parser(property_def.syntax);
+
+    auto syntax = syntax_parser.parse_syntax();
+    if (syntax.is_error()) {
+        return WebIDL::SyntaxError::create(realm, "Invalid syntax string"_string);
+    }
+
+    // 4. If syntax definition is the universal syntax definition, and initialValue is not present, let parsed initial value be empty.
+    //    This must be treated identically to the "default" initial value of custom properties, as defined in [css-variables].
+    //    Skip to the next step of this algorithm.
+
+    //    Otherwise, if syntax definition is the universal syntax definition, parse initialValue as a <declaration-value>. If this fails, throw a SyntaxError and exit this algorithm. Otherwise, let parsed initial value be the parsed result. Skip to the next step of this algorithm.
+
+    //    Otherwise, if initialValue is not present, throw a SyntaxError and exit this algorithm.
+
+    //    Otherwise, parse initialValue according to syntax definition. If this fails, throw a SyntaxError and exit this algorithm.
+
+    //    Otherwise, let parsed initial value be the parsed result. If parsed initial value is not computationally independent, throw a SyntaxError and exit this algorithm.
+
+    // 5. Set inherit flag to the value of inherits.
+
+    // 6. Let registered property be a struct with
+    //    a property name of name,
+    //    a syntax of syntax definition,
+    //    an initial value of parsed initial value, and
+    //    an inherit flag of inherit flag.
+    //    Append registered property to property set.
 
     property_set.set(property_def.name, {});
     return {};
